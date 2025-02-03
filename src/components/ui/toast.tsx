@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
+import { X, Check, AlertCircle, Info } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -27,9 +27,11 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "border bg-background text-foreground",
-        destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
+        default: "border bg-background",
+        error: "error group border-red-200 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-900 dark:text-red-100",
+        info: "info group border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-900 dark:text-blue-100",
+        warning: "warning group border-yellow-200 bg-yellow-50 text-yellow-900 dark:border-yellow-800 dark:bg-yellow-900 dark:text-yellow-100",
+        success: "success group border-green-200 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-900 dark:text-green-100",
       },
     },
     defaultVariants: {
@@ -56,15 +58,20 @@ Toast.displayName = ToastPrimitives.Root.displayName
 const ToastAction = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Action>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Action>
->(({ className, ...props }, ref) => (
+>(({ className, altText, ...props }, ref) => (
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+      "group-[.success]:bg-green-50 group-[.success]:text-green-900 group-[.success]:hover:bg-green-100 group-[.success]:focus:ring-green-400",
+      "group-[.error]:bg-red-50 group-[.error]:text-red-900 group-[.error]:hover:bg-red-100 group-[.error]:focus:ring-red-400",
       className
     )}
     {...props}
-  />
+  >
+    {props.children}
+    <span className="sr-only">{altText}</span>
+  </ToastPrimitives.Action>
 ))
 ToastAction.displayName = ToastPrimitives.Action.displayName
 
@@ -74,10 +81,16 @@ const ToastClose = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Close
     ref={ref}
-    className={cn(
-      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
-      className
-    )}
+    className={cn(`
+      absolute right-2 top-2 rounded-md p-1 
+      text-foreground/50 opacity-100 transition-all
+      hover:text-foreground focus:opacity-100 focus:outline-none 
+      focus:ring-2 hover:scale-110
+      group-[.success]:text-green-600 group-[.success]:hover:text-green-700
+      group-[.error]:text-red-600 group-[.error]:hover:text-red-700
+      group-[.info]:text-blue-600 group-[.info]:hover:text-blue-700
+      group-[.warning]:text-yellow-600 group-[.warning]:hover:text-yellow-700
+    `, className)}
     toast-close=""
     {...props}
   >
@@ -92,7 +105,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn("text-sm font-semibold", className)}
+    className={cn("text-sm font-semibold flex items-center gap-2", className)}
     {...props}
   />
 ))
